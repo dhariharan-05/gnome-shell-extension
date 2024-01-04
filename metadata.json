@@ -1,0 +1,8 @@
+{
+  "name": "Mount Meter",
+  "description": "Easily monitor and manage your mounted removable drives, displaying sizes and highlighting the drive with the least space in the top bar for optimal disk usage.",
+  "uuid": "mountMeter@dhariharan26.gmail.com",
+  "shell-version": [
+    "45"
+  ]
+}
