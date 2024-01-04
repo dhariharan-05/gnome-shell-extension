@@ -1,6 +1,6 @@
 {
   "name": "Mount Meter",
-  "description": "Easily monitor and manage your mounted removable drives, displaying sizes and highlighting the drive with the least space in the top bar.Forked and Modified extensively from Removable Drive Menu by fmuellner",
+  "description": "Easily monitor and manage your mounted removable drives, displaying sizes and highlighting the mount with the least used space in the top bar.Forked and Modified extensively from Removable Drive Menu by fmuellner",
   "uuid": "mountMeter@dhariharan26.gmail.com",
   "shell-version": ["45"],
   "url": "https://github.com/dhariharan-05/gnome-shell-extension-mount-meter"
