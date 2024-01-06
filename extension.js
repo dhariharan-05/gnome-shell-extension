@@ -324,7 +324,15 @@ export default class IndicatorExampleExtension extends Extension {
     }
 
     disable() {
+    
+        if(this._timeout){
+              Glib.source_remove(this._timeout);
+              this._timeout = null;
+        }
+        
         this._indicator.destroy();
         this._indicator = null;
+        sizeDisplay = null;
+        
     }
 }
