@@ -33,7 +33,6 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-let sizeDisplay;
 const MountMenuItem = GObject.registerClass({
         GTypeName: 'Gjs_MountMenuItem',
         Properties: {
@@ -187,15 +186,14 @@ const Indicator = GObject.registerClass(
             
             box.add_child(stor);
             
-            sizeDisplay = new St.Label({
-                style_class: 'sizeDisplay',
+            this.sizeDisplay = new St.Label({
                 text: 'No mounts...',
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.CENTER
                 
             });
             
-            box.add_child(sizeDisplay);
+            box.add_child(this.sizeDisplay);
             this.add_child(box);
             this.timerMap = new Map();
             this._monitor = Gio.VolumeMonitor.get();
@@ -254,7 +252,7 @@ const Indicator = GObject.registerClass(
                 
                 this.mountName = map1.keys().next().value; // Stores Mount Name
                 this.mountSize = map1.get(this.mountName); //Stores its size in percentage
-                sizeDisplay.set_text(this.mountName.toString());
+                this.sizeDisplay.set_text(this.mountName.toString());
                 this.count = 0;
                 this._secondaryTimer();
                 map1 = null;//Makes map1 ready for garbage collection
@@ -265,33 +263,35 @@ const Indicator = GObject.registerClass(
             const priority = GLib.PRIORITY_DEFAULT;
             const refresh_time = 2; 
             
-            if (this.mountName === sizeDisplay.get_text()) {
-                sizeDisplay.set_text(this.mountSize.toString() + '%');
+            if (this.mountName === this.sizeDisplay.get_text()) {
+                this.sizeDisplay.set_text(this.mountSize.toString() + '%');
                 this.count = this.count + 1;
 
             } else {
-                sizeDisplay.set_text(this.mountName.toString());
+                this.sizeDisplay.set_text(this.mountName.toString());
                 this.count = this.count + 1;
             }
             if (this._timeout) {
                 GLib.source_remove(this._timeout);
             }
             this._timeout = GLib.timeout_add_seconds(priority, refresh_time, () => {
-                this._secondaryTimer();
+            this._secondaryTimer();
 
                 if (this.count === 5) {
-                    this._stop();
+                    GLib.source_remove(this._timeout);
+                    this._timeout = undefined;
                     return false; // Return false to stop the timer loop
                 }
                 return true;
             });
         }
 
-        _stop() {
+        destroy() {
             if (this._timeout) {
                 GLib.source_remove(this._timeout);
             }
             this._timeout = undefined;
+            super.destroy();
         }
 
         _removeMount(mount) {
@@ -317,22 +317,14 @@ const Indicator = GObject.registerClass(
     }
 );
 
-export default class IndicatorExampleExtension extends Extension {
+export default class MountMeterExtension extends Extension {
     enable() {
         this._indicator = new Indicator();
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
     disable() {
-    
-        if(this._timeout){
-              Glib.source_remove(this._timeout);
-              this._timeout = null;
-        }
-        
         this._indicator.destroy();
         this._indicator = null;
-        sizeDisplay = null;
-        
     }
 }
